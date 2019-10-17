@@ -1,0 +1,75 @@
+---
+version: '3'
+
+networks:
+  net-r01:
+    ipam:
+      config:
+        - subnet: 192.168.255.0/24
+  net-r02:
+    ipam:
+      config:
+        - subnet: 192.168.254.0/24
+  net-r03:
+    ipam:
+      config:
+        - subnet: 192.168.253.0/24
+  net-peer:
+    ipam:
+      config:
+        - subnet: 10.0.255.0/24
+  net-mgmt:
+    ipam:
+      config:
+        - subnet: 192.168.10.0/24
+
+services:
+  bmpd:
+    image: osrg/ryu:master
+    container_name: bmpd
+    command: ["ryu","run", "--verbose", "./ryu-master/ryu/app/bmpstation"]
+    networks: 
+      net-mgmt:
+        ipv4_address: 192.168.10.10
+
+  r01:
+    image: opennms/gobgp:2.9.0
+    container_name: r01
+    volumes: 
+      - ./r01/gobgpd.conf:/gobgpd.conf
+    networks:
+      net-r01:
+        ipv4_address: 192.168.255.5
+      net-peer:
+        ipv4_address: 10.0.255.5
+      net-mgmt:
+        ipv4_address: 192.168.10.5
+    command: ["-f", "/gobgpd.conf"]
+
+  r02:
+    image: opennms/gobgp:2.9.0
+    container_name: r02
+    volumes: 
+      - ./r02/gobgpd.conf:/gobgpd.conf
+    networks:
+      net-r02:
+        ipv4_address: 192.168.254.5
+      net-peer:
+        ipv4_address: 10.0.255.6
+      net-mgmt:
+        ipv4_address: 192.168.10.6
+    command: ["-f", "/gobgpd.conf"]
+
+  r03:
+    image: opennms/gobgp:2.9.0
+    container_name: r03
+    volumes: 
+      - ./r03/gobgpd.conf:/gobgpd.conf
+    networks:
+      net-r03:
+        ipv4_address: 192.168.253.5
+      net-peer:
+        ipv4_address: 10.0.255.7
+      net-mgmt:
+        ipv4_address: 192.168.10.7
+    command: ["-f", "/gobgpd.conf"]
