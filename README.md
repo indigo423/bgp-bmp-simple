@@ -16,7 +16,7 @@ Announce routes
 docker-compose exec r01 gobgp global rib add 192.168.255.0/24 -a ipv4
 ```
 
-Remote routes
+Remove routes
 
 ```
 docker-compose exec r01 gobgp global rib del 192.168.255.0/24 -a ipv4
